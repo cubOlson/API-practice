@@ -2,7 +2,7 @@ const express = require('express');
 const db = require("../db/models");
 const { Tweet } = db;
 const router = express.Router();
-const { asyncHandler } = require('./utils.js');
+const { asyncHandler, handleValidationErrors } = require('./utils.js');
 const { check, validationResult } = require('express-validator');
 
 const tweetNotFoundError = function (tweetId){
@@ -16,21 +16,6 @@ const tweetValidators = [
         .exists({ checkFalsy: true })
         .isLength({ max: 280 })
 ];
-
-const handleValidationErrors = (req, res, next) => {
-    const validationErrors = validationResult(req);
-
-    if (!validationErrors.isEmpty()) {
-      const errors = validationErrors.array().map((error) => error.msg);
-
-      const err = Error("Bad request.");
-      err.errors = errors;
-      err.status = 400;
-      err.title = "Bad request.";
-      return next(err);
-    }
-    next();
-  };
 
 router.get('/', asyncHandler( async (req, res) => {
     const tweets = await Tweet.findAll()
