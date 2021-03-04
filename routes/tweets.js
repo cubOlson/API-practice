@@ -4,6 +4,7 @@ const { Tweet } = db;
 const router = express.Router();
 const { asyncHandler, handleValidationErrors } = require('./utils.js');
 const { check, validationResult } = require('express-validator');
+const { requireAuth } = require("../auth");
 
 const tweetNotFoundError = function (tweetId){
     const err = new Error('Tweet not found');
@@ -16,6 +17,8 @@ const tweetValidators = [
         .exists({ checkFalsy: true })
         .isLength({ max: 280 })
 ];
+
+router.use(requireAuth);
 
 router.get('/', asyncHandler( async (req, res) => {
     const tweets = await Tweet.findAll()
